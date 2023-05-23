@@ -1,0 +1,30 @@
+version: "3.9"
+
+volumes:
+  postgres:
+
+networks:
+  smnet:
+    driver: bridge
+
+services:
+  postgres2:
+    image: postgres:15.2
+    restart: always
+    hostname: postgres
+    volumes:
+      - ./db/service.up.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres:/data/postgres
+    environment:
+      POSTGRES_DB: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    ports:
+      - "5432:5432"
+    networks:
+      - smnet
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
